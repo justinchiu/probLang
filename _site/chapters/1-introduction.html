@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Introducing the Rational Speech Act framework</title>
+  <link rel="stylesheet" href="http://yui.yahooapis.com/pure/0.6.0/pure-min.css">
+  <link rel="stylesheet" href="/probLang/assets/css/main.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.5.1/katex.min.css">
+  <!-- <link rel="stylesheet" href="/probLang/assets/css/editor.css"> -->
+  <!-- <link rel="stylesheet" href="/probLang/assets/css/webppl-viz.css"> -->
+  <link rel="stylesheet" href="http://s3-us-west-2.amazonaws.com/cdn.webppl.org/webppl-editor-1.0.1.css">
+  <link rel="stylesheet" href="http://s3-us-west-2.amazonaws.com/cdn.webppl.org/webppl-viz-0.7.6.css">
+  <link href='https://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'>
+  <link rel="canonical" href="http://localhost:4000/probLang/chapters/1-introduction.html">
+  <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.5.1/katex.min.js"></script>
+  <script src="/probLang/assets/js/parse-bibtex.js"></script>
+  <script src="/probLang/assets/js/main.js"></script>
+  <!-- <script src="/probLang/assets/js/webppl-editor.js"></script> -->
+  <!-- <script src="/probLang/assets/js/webppl-viz.js"></script>   -->
+  <!-- <script src="/probLang/assets/js/webppl.min.js" defer async></script> -->
+  <script src="https://s3-us-west-2.amazonaws.com/cdn.webppl.org/webppl-editor-1.0.9.js"></script>
+  <script src="https://s3-us-west-2.amazonaws.com/cdn.webppl.org/webppl-viz-0.7.11.js"></script>
+  <script src="https://s3-us-west-2.amazonaws.com/cdn.webppl.org/webppl-v0.9.7.js" defer async></script>
+</head>
+
+
+  <body>
+
+    <header class="site-header">
+  <a class="site-title" href="/probLang/">Probabilistic languge understanding</a>
+</header>
+
+
+    <div class="page-content-wrapper">
+      <div class="page-content">
+        <h1 class="chapter-title">Introducing the Rational Speech Act framework</h1>
+
+<h3 id="day-1-language-understanding-as-bayesian-inference">Day 1: Language understanding as Bayesian inference</h3>
+
+<!--   - Gricean pragmatics, probability theory, and utility functions
+  - The basic Rational Speech-Acts framework
+  - Background knowledge in language understanding -->
+
+<!-- One of the most remarkable aspects of natural language is its compositionality: speakers generate arbitrarily complex meanings by stitching together their smaller, meaning-bearing parts. The compositional nature of language has served as the bedrock of semantic (indeed, linguistic) theory since its modern inception; \cite{montague1973} builds this principle into the bones of his semantics, demonstrating with his fragment how meaning gets constructed from a lexicon and some rules of composition. Since then, compositionality has continued to guide semantic inquiry: what are the meaning of the parts, and what is the nature of the mechanism that composes them? Put differently, what are the representations of the language we use, and what is the nature of the computational system that manipulates them? -->
+
+<p>The Rational Speech Act (RSA) framework views communication as recursive reasoning between a speaker and a listener. The listener interprets the speaker’s utterance by reasoning about a cooperative speaker trying to inform a naive listener about some state of affairs. Using Bayesian inference, the listener infers what the state of the world is likely to be given that a speaker produced some utterance, knowing that the speaker is reasoning about how a listener is most likely to interpret that utterance. Thus, we have (at least) three levels of inference. At the top, the sophisticated, <strong>pragmatic listener</strong>, <script type="math/tex">L_{1}</script>, reasons about the <strong>pragmatic speaker</strong>, <script type="math/tex">S_{1}</script>, and infers the state of the world <script type="math/tex">s</script> given that the speaker chose to produce the utterance <script type="math/tex">u</script>. The speaker chooses <script type="math/tex">u</script> by maximizing the probability that a naive, <strong>literal listener</strong>, <script type="math/tex">L_{0}</script>, would correctly infer the state of the world <script type="math/tex">s</script> given the literal meaning of <script type="math/tex">u</script>.</p>
+
+<p>At the base of this reasoning, the naive, literal listener <script type="math/tex">L_{0}</script> interprets an utterance according to its meaning. That is, <script type="math/tex">L_{0}</script> computes the probability of <script type="math/tex">s</script> given <script type="math/tex">u</script> according to the semantics of <script type="math/tex">u</script> and the prior probability of <script type="math/tex">s</script>. A standard view of the semantic content of an utterance suffices: a mapping from states of the world to truth values.</p>
+
+<!-- <center>The literal listener: P<sub>L<sub>0</sub></sub>(s|u) ∝ ⟦u⟧(s) · P(s)</center> -->
+
+<script type="math/tex; mode=display">P_{L_{0}}(s\mid u) \propto [\![u]\!](s) \cdot P(s)</script>
+
+<!-- \mid -->
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// possible objects of reference
+var objectPrior = function() {
+  uniformDraw([
+    {shape: "square", color: "blue"},
+    {shape: "circle", color: "blue"},
+    {shape: "square", color: "green"}
+  ])
+}
+
+// possible one-word utterances
+var utterances = ["blue","green","square","circle"]
+
+// meaning function to interpret the utterances
+var meaning = function(utterance, obj){
+  (utterance === "blue" || utterance === "green") ? utterance === obj.color :
+  (utterance === "circle" || utterance === "square") ? utterance === obj.shape :
+  true
+}
+
+// literal listener
+var literalListener = function(utterance){
+  Infer({model: function(){
+    var obj = objectPrior();
+    var uttTruthVal = meaning(utterance, obj);
+    condition(uttTruthVal == true)
+    return obj
+  }})
+}
+
+viz.table(literalListener("blue"))
+
+</code></pre></div></div>
+
+<blockquote>
+  <p><strong>Exercises:</strong></p>
+</blockquote>
+
+<blockquote>
+  <ol>
+    <li>Check what happens with the other utterances.</li>
+    <li>In the model above, <code class="highlighter-rouge">objectPrior()</code> returns a sample from a <code class="highlighter-rouge">uniformDraw</code> over the possible objects of reference. What happens when the listener’s beliefs are not uniform over the possible objects of reference (e.g., the “green square” is very salient)? (Hint, use a <code class="highlighter-rouge">categorical</code> distribution by calling <code class="highlighter-rouge">categorical({ps: [list_of_probabilities], vs: [list_of_states]})</code>).</li>
+  </ol>
+</blockquote>
+
+<p>Fantastic! We now have a way of integrating a listener’s prior beliefs about the world with the truth functional meaning of an utterance.</p>
+
+<p>What about speakers? Speech acts are actions; thus, the speaker is modeled as a rational (Bayesian) actor. He chooses an action (e.g., an utterance) according to its utility. The speaker simulates taking an action, evaluates its utility, and chooses actions in proportion to their utility. This is called a <em>softmax</em> optimal agent; a fully optimal agent would choose the action with the highest utility all of the time. (This kind of model is called <em>action as inverse planning</em>; for more on this, see <a href="http://agentmodels.org/chapters/3-agents-as-programs.html">agentmodels.org</a>.)</p>
+
+<p>In the code box below you’ll see a generic softmax agent model. Note that in this model, <code class="highlighter-rouge">agent</code> uses <code class="highlighter-rouge">factor</code> (not <code class="highlighter-rouge">condition</code>). <code class="highlighter-rouge">factor</code> is a continuous (or, softer) version of <code class="highlighter-rouge">condition</code> that takes real numbers as arguments (instead of binary truth values). Higher numbers (here, utilities) upweight the probabilities of the actions associated with them.</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// define possible actions
+var actions = ['a1', 'a2', 'a3'];
+
+// define some utilities for the actions
+var utility = function(action){
+  var table = {
+    a1: -1,
+    a2: 6,
+    a3: 8
+  };
+  return table[action];
+};
+
+// define actor optimality
+var optimality = 1
+
+// define a rational agent who chooses actions
+// according to their expected utility
+var agent = Infer({ model: function(){
+    var action = uniformDraw(actions);
+    factor(optimality * utility(action));
+    return action;
+}});
+
+print("the probability that an agent will take various actions:")
+viz(agent);
+
+</code></pre></div></div>
+
+<blockquote>
+  <p><strong>Exercises:</strong></p>
+</blockquote>
+
+<blockquote>
+  <ol>
+    <li>Explore what happens when you change the agent’s optimality.</li>
+    <li>Explore what happens when you change the utilities.</li>
+  </ol>
+</blockquote>
+
+<p>In language understanding, the utility of an utterance is how well it communicates the state of the world <script type="math/tex">s</script> to a listener. So, the speaker <script type="math/tex">S_{1}</script> chooses utterances <script type="math/tex">u</script> to communicate the state <script type="math/tex">s</script> to the hypothesized literal listener <script type="math/tex">L_{0}</script>. Another way to think about this: <script type="math/tex">S_{1}</script> wants to minimize the effort <script type="math/tex">L_{0}</script> would need to arrive at <script type="math/tex">s</script> from <script type="math/tex">u</script>, all while being efficient at communicating. <script type="math/tex">S_{1}</script> thus seeks to minimize the surprisal of <script type="math/tex">s</script> given <script type="math/tex">u</script> for the literal listener <script type="math/tex">L_{0}</script>, while bearing in mind the utterance cost, <script type="math/tex">C(u)</script>. (This trade-off between efficacy and efficiency is not trivial: speakers could always use minimal ambiguity, but unambiguous utterances tend toward the unwieldy, and, very often, unnecessary. We will see this tension play out later in the course.)</p>
+
+<p>Speakers act in accordance with the speaker’s utility function <script type="math/tex">U_{S_{1}}</script>: utterances are more useful at communicating about some state as surprisal and utterance cost decrease.</p>
+
+<script type="math/tex; mode=display">U_{S_{1}}(u; s) = log(L_{0}(s\mid u)) - C(u)</script>
+
+<p>(In WebPPL, <script type="math/tex">log(L_{0}(s\mid u))</script> can be accessed via <code class="highlighter-rouge">literalListener(u).score(s)</code>.)</p>
+
+<p>With this utility function in mind, <script type="math/tex">S_{1}</script> computes the probability of an utterance <script type="math/tex">u</script> given some state <script type="math/tex">s</script> in proportion to the speaker’s utility function <script type="math/tex">U_{S_{1}}</script>. The term <script type="math/tex">\alpha > 0</script> controls the speaker’s optimality, that is, the speaker’s rationality in choosing utterances.</p>
+
+<!-- <center>The pragmatic speaker: P<sub>S<sub>1</sub></sub>(u|s) ∝ exp(αU<sub>S<sub>1</sub></sub>(u;s))</center> -->
+
+<script type="math/tex; mode=display">P_{S_{1}}(u\mid s) \propto exp(\alpha U_{S_{1}}(u; s))</script>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// pragmatic speaker
+var speaker = function(obj){
+  Infer({model: function(){
+    var utterance = utterancePrior();
+    factor(alpha * literalListener(utterance).score(obj))
+    return utterance
+  }})
+}
+</code></pre></div></div>
+
+<blockquote>
+  <p><strong>Exercise:</strong> Check the speaker’s behavior for a blue square.</p>
+</blockquote>
+
+<p>We now have a model of the generative process of an utterance. With this in hand, we can imagine a listener who thinks about this kind of speaker.</p>
+
+<p>The pragmatic listener <script type="math/tex">L_{1}</script> computes the probability of a state <script type="math/tex">s</script> given some utterance <script type="math/tex">u</script>. By reasoning about the speaker <script type="math/tex">S_{1}</script>, this probability is proportional to the probability that <script type="math/tex">S_{1}</script> would choose to utter <script type="math/tex">u</script> to communicate about the state <script type="math/tex">s</script>, together with the prior probability of <script type="math/tex">s</script> itself. In other words, to interpret an utterance, the pragmatic listener considers the process that <em>generated</em> the utterance in the first place. (Note that the listener model uses <code class="highlighter-rouge">observe</code>, which functions like <code class="highlighter-rouge">factor</code> with <script type="math/tex">\alpha</script> set to <script type="math/tex">1</script>.)</p>
+
+<!-- <center>The pragmatic listener: P<sub>L<sub>1</sub></sub>(s|u) ∝ P<sub>S<sub>1</sub></sub>(u|s) · P(s)</center> -->
+
+<script type="math/tex; mode=display">P_{L_{1}}(s\mid u) \propto P_{S_{1}}(u\mid s) \cdot P(s)</script>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// pragmatic listener
+var pragmaticListener = function(utterance){
+  Infer({method:"enumerate"}, function(){
+    var obj = objectPrior();
+    observe(speaker(obj), utterance)
+    return obj
+  })
+}
+</code></pre></div></div>
+
+<p>Within the RSA framework, communication is thus modeled as in Fig. 1, where <script type="math/tex">L_{1}</script> reasons about <script type="math/tex">S_{1}</script>’s reasoning about a hypothetical <script type="math/tex">L_{0}</script>.</p>
+
+<p><img src="../images/rsa_schema.png" alt="Fig. 1: Graphical representation of the Bayesian RSA model." style="width: 400px;" /></p>
+<center>Fig. 1: Bayesian RSA schema.</center>
+
+<h4 id="application-1-simple-referential-communication">Application 1: Simple referential communication</h4>
+
+<p>In its initial formulation, reft:frankgoodman2012 use the basic RSA framework to model referent choice in efficient communication. To see the mechanism at work, imagine a referential communication game with three objects, as in Fig. 2.</p>
+
+<p><img src="../images/rsa_scene.png" alt="Fig. 2: Example referential communication scenario from Frank &amp; Goodman (2012). Speakers choose a single word, $$u$$, to signal an object, $$s$$." style="width: 400px;" /></p>
+<center>Fig. 2: Example referential communication scenario from Frank and Goodman. Speakers choose a single word, <i>u</i>, to signal an object, <i>s</i>.</center>
+
+<p>Suppose a speaker wants to signal an object, but only has a single word with which to do so. Applying the RSA model schematized in Fig. 1 to the communication scenario in Fig. 2, the speaker <script type="math/tex">S_{1}</script> chooses a word <script type="math/tex">u</script> to best signal an object <script type="math/tex">s</script> to a literal listener <script type="math/tex">L_{0}</script>, who interprets <script type="math/tex">u</script> in proportion to the prior probability of naming objects in the scenario (i.e., to an object’s salience, <script type="math/tex">P(s)</script>). The pragmatic listener <script type="math/tex">L_{1}</script> reasons about the speaker’s reasoning, and interprets <script type="math/tex">u</script> accordingly. By formalizing the contributions of salience and efficiency, the RSA framework provides an information-theoretic definition of informativeness in pragmatic inference. <!-- This definition will prove crucial in understanding the contribution of contextual pre- dictability of collective properties in the interpretation of plural predication. --></p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// Here is the code from the Frank and Goodman RSA model
+
+// possible objects of reference
+var objectPrior = function() {
+  uniformDraw([
+    {shape: "square", color: "blue"},
+    {shape: "circle", color: "blue"},
+    {shape: "square", color: "green"}
+  ])
+}
+
+// possible one-word utterances
+var utterances = ["blue","green","square","circle"]
+
+// meaning function to interpret the utterances
+var meaning = function(utterance, obj){
+  (utterance === "blue" || utterance === "green") ? utterance === obj.color :
+  (utterance === "circle" || utterance === "square") ? utterance === obj.shape :
+  true
+}
+
+// literal listener
+var literalListener = function(utterance){
+  Infer({model: function(){
+    var obj = objectPrior();
+    condition(meaning(utterance, obj))
+    return obj
+  }})
+}
+
+// set speaker optimality
+var alpha = 1
+
+// pragmatic speaker
+var speaker = function(obj){
+  Infer({model: function(){
+    var utterance = uniformDraw(utterances)
+    factor(alpha * literalListener(utterance).score(obj))
+    return utterance
+  }})
+}
+
+// pragmatic listener
+var pragmaticListener = function(utterance){
+  Infer({model: function(){
+    var obj = objectPrior()
+    observe(speaker(obj),utterance)
+    return obj
+  }})
+}
+
+print("literal listener's interpretation of 'blue':")
+viz.table(literalListener( "blue"))
+print("speaker's utterance distribution for a blue circle:")
+viz.table(speaker({shape:"circle", color: "blue"}))
+print("pragmatic listener's interpretation of 'blue':")
+viz.table(pragmaticListener("blue"))
+
+</code></pre></div></div>
+
+<blockquote>
+  <p><strong>Exercises:</strong></p>
+</blockquote>
+
+<blockquote>
+  <ol>
+    <li>Explore what happens if you make the speaker <em>more</em> optimal.</li>
+    <li>Add another object to the scenario.</li>
+    <li>Add a new multi-word utterance.</li>
+    <li>Check the behavior of the other possible utterances.</li>
+  </ol>
+</blockquote>
+
+<p>In the <a href="2-pragmatics.html">next chapter</a>, we’ll see how RSA models have been developed to model more complex aspects of pragmatic reasoning and language understanding.</p>
+
+
+<hr>
+
+<a href="/probLang/">Table of Contents</a>
+
+      </div>
+    </div>
+
+    <footer class="site-footer">
+  <a href="github.com/probmods/ppaml2016" id="github-edit-link">Edit on Github</a>
+</footer>
+
+<script type="text/javascript">
+  $("#github-edit-link").attr("href", github_page_url("/chapters/1-introduction.html"))
+</script>
+
+
+  </body>
+
+</html>
