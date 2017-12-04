@@ -10,6 +10,7 @@ Introduction
 
 #### Section 1: Semantic Theory
 Talk about semantic theory.
+![alt text]()
 
 #### Section 2: Simple Model
 
