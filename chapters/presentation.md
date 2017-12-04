@@ -351,6 +351,12 @@ is used if an entity's latent access variable is greater than or equal to the
 corresponding threshold, with the pronoun RE taking precedence over the demonstrative.
 If the entity's access is lower than both thresholds, we default to the definite description.
 
+This is indeed similar to the Tessler and Goodman model of generics in spirit.
+A referring expression is “endorsed” if an entity’s access exceeds a threshold.
+However, the main difference is that there are multiple thresholds which have an ordering according to preference. 
+Rather than just endorsing a referring expression in isolation,
+the speaker must pick the expression that has the highest preference as well as appropriate threshold according to the entity’s accessibility.
+
 We introduce a softer meaning function in order to prevent all paths from having zero mass
 during inference. This comes up, for example, in the following situation:
 
