@@ -979,7 +979,7 @@ var printer = map(function(ref) {
 ~~~~
 
 The results are essentially the same. The small difference in the posterior distributions
-are a result of the lack of influence the literal listener's prior. Since the
+are a result of the lack of influence from the literal listener's prior. Since the
 literal listener had a uniformly uninformative prior, this could be seen as using a 
 higher temperature in the Gibbs distributions.
 
