@@ -47,13 +47,16 @@ and listeners must pragmatically infer the speaker’s thresholds for using spec
 
 #### Threshold Model
 
-##### Constants
+##### Setup
+
+We model the state as a list of entities that are of either male or female gender, and only have one other
+identifying property: their height. For our model we assume that
+every possible combination of gender and height is enumerated in the state.
+
+The possible utterances are then the pronouns "null", "he", and "she"; the demonstratives
+"that girl", "that boy"; and the definite descriptions "the tall girl", "the short girl", etc.
 
 ~~~~
-// Possible utterances
-var utterances = ['null','he', 'she', 'that boy', 'that girl', 'the tall boy',
-                 'the short boy', 'the tall girl', 'the short girl']
-
 // Possible properties.
 var genders = ["male", "female"]
 var heights = ["short", "tall"]
@@ -89,11 +92,27 @@ var state = [
     access: 3
   }
 ]
+
+// Possible utterances
+var utterances = ['null','he', 'she', 'that boy', 'that girl', 'the tall boy',
+                 'the short boy', 'the tall girl', 'the short girl']
 ~~~~
 
 ##### Priors
 
+The utterance prior is engineered as an inverted word count model
+so as to avoid specifying a separate utility function.
+Shorter utterances, such as the pronouns, receive higher mass than longer utterances.
+This is highly analgous to coding or compression schemes which seek to minimize total message length.
+
+For our state prior, since we would like to have a fully enumerated state, we can sample
+accessibility levels for each of the possible entities.
+
 ~~~~
+// Possible utterances
+var utterances = ['null','he', 'she', 'that boy', 'that girl', 'the tall boy',
+                 'the short boy', 'the tall girl', 'the short girl']
+                 
 // Essentially an inverted word count model.
 var utterancePrior = function(){
   var ps = [4,3,3,2,2,1,1,1,1]
@@ -113,43 +132,29 @@ var statePrior = function(state) {
 }
 ~~~~
 
-Next, we introduce two accessibility thresholds, one each for the demonstrative and pronoun referring expressions.
+At this point, our setup looks a bit like Frank and Goodman's original RSA model for the blue circle
+reference game. We have a state where entities share properties, and thus some referring expressions may
+be ambiguous. For example, similar to how we would disambiguate "blue" to refer to the blue circle or square,
+how can we resolve the pronoun "he" if the state contains two males of different heights?
+
+To do so we introduce two accessibility thresholds, one each for the demonstrative and pronoun referring expressions.
 Intuitively, we assume that either referring expression
 is used if an entity's accessibility is greater than or equal to the 
 corresponding threshold, with the pronoun taking precedence over the demonstrative.
 If the entity's access is lower than both thresholds, we default to the definite description.
 
-This is indeed similar to the Lassiter and Goodman model of generics in spirit.
-A referring expression is “endorsed” if an entity’s accessibility exceeds a threshold.
-However, the main difference is that there are multiple thresholds which have an ordering according to preference. 
-Rather than just endorsing a referring expression in isolation,
-the speaker must pick the expression that has the highest preference as well as appropriate threshold according to the entity’s accessibility.
+This is similar to the Lassiter and Goodman model for gradable adjectives.
+Analogous to how a threshold on cost was communicated by the statement "expensive",
+a referring expression marks whether an entity’s accessibility exceeds a threshold.
+Since we have multiple thresholds, the analogous setup for kettles would be to have one threshold for
+"expensive" and one for "very expensive".
+The main difference between our model and the Lassiter and Goodman model
+is that the comparison class for an object (in the case of 
+the gradable adjectives model, this would be the cost of a kettle) would be all possible objects (costs of kettles)
+in the adjectives model. 
+In our setting the accessibility of an entity must only compete with other existing entities in the state. 
 
-Listener must infer the threshold for which an entity can qualify for a lower-cost utterance.
-
-Frank goodman, state with shared properties, have to use RSA to pragmatically disambiguate utterances. Blue vs he
-
-Comparison class, not other imaginable kettles, kind of closed because it's all possible referents.
-
-We introduce a softer meaning function in order to prevent all paths from having zero mass
-during inference. This comes up, for example, in the following situation:
-
-Accessibility shouldn't be a hard threshold, ie if you refer to a male you haven't talked about in a while
-as "he", it might be confusing but the listener will still be able to resolve it.
-
-~~~~
-var utterance = "he"
-var state = [
-  {
-    gender: "female",
-    height: "short",
-    access : 1
-  }
-]
-~~~~
-
-The solution is simple, albeit slightly hacky:
-
+We also introduce a soft meaning function:
 ~~~~
 var softMeanings = function(utterance, referent, theta_dem, theta_pro){
   return utterance == "null" ?
@@ -173,8 +178,15 @@ var softMeanings = function(utterance, referent, theta_dem, theta_pro){
   false
 };
 ~~~~
+We assume that the definite description is true as long as the referent satisfies its property requirements.
+We opt to interpret the thresholded utterances probabilistically, since thresholds are not necessarily hard constraints.
+Consider the example that the only male entity in the state has not been mentioned for a long time, 
+but someone refers to him as "he". This would be awkward for us to resolve, but not impossible.
 
 We now present the threshold model in its entirety.
+One interesting aspect is that every stage of the model sees the "state".
+This is different from other models we have seen, but is really only a result of variable naming.
+Since the referent is only seen the speakers, we are not violating any RSA contracts.
 
 ~~~~
 ///fold:
@@ -362,16 +374,7 @@ var pragmaticSpeaker = function(state, referent) {
 
 #### A simple case
 
-Note that low access male and low access female get the same RE, the definite,
-even though they have different accessibilities. This is due to the
-model emphasizing the relative accesibilites within entities that share a feature.
-
-Given that the model performs inference over relative accessibilities with respect to
-entities that share properties, you might expect that the highest access
-entities in each class might have a similar utterance distribution.
-However, this is not the case, as the "null" utterance treats the entire state
-as its comparison class.
-
+Let's consider a small state:
 ~~~~
 ///fold:
 // Utility Functions
@@ -529,7 +532,7 @@ var pragmaticSpeaker = function(state, referent) {
 
 ///
 
-// A partial state.
+// A simple state.
 var state = [
   {
     gender: "male",
@@ -572,6 +575,17 @@ var printer = map(function(ref) {
     viz.table(pragmaticSpeaker(state, ref))
 }, state)
 ~~~~
+
+Note that utterance distributions of the low access male and low access female have the same ordering over REs,
+even though they have different accessibilities. This is due to the
+model partitioning the mass of utterances over semantically compatible entities.
+
+Given that the model performs inference over relative accessibilities with respect to
+entities that share properties, you might expect that the highest access
+entities in each class might have a similar utterance distribution.
+However, this is not the case, as the "null" utterance treats the entire state
+as its comparison class.
+
 
 #### Fully enumerated state
 
