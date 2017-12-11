@@ -143,6 +143,10 @@ the utterance "blue" could refer to either the blue circle or the blue square.
 Frank and Goodman's model is able to reason that "blue" is more likely to refer to the
 blue circle, since "square" would have been a more informative utterance for the blue square.
 In our state, an ambiguous utterance could be "he" in a state with multiple male entities.
+In both cases, the state is static and the referent is inferred through the model.
+The Frank and Goodman model's literal listener \\(L_0\\) has a uniform prior over possible referents or objects in the state,
+and our model has a more informative prior over possible referents or entities in the state that is parameterized
+by their respective accessibilities.
 
 In order to disambiguate such an utterance we introduce two accessibility thresholds, 
 one each for the demonstrative and pronoun referring expressions.
@@ -184,6 +188,7 @@ var softMeanings = function(utterance, referent, theta_dem, theta_pro){
   false
 };
 ~~~~
+
 We assume that the definite description is true as long as the referent satisfies its property requirements.
 We opt to interpret the thresholded utterances probabilistically, since thresholds are not necessarily hard constraints.
 Consider the example that the only male entity in the state has not been mentioned for a long time, 
@@ -193,6 +198,12 @@ We now present the threshold model in its entirety.
 One interesting aspect is that every stage of the model sees the "state".
 This is different from other models we have seen, but is really only a result of variable naming.
 Since the referent is only seen the speakers, we are not violating any RSA contracts.
+
+
+\\[ L_0 \propto [[u]]^\theta(s) \cdot p(e) \\]
+\\[ S_1 = p(u | e, s, \theta; L_0) \propto p(e | u, s, \theta; L_0) \cdot p(u)\\]
+\\[ L_1 \propto p(u | e, s, \theta; S_1) \cdot p(e) \cdot p(\theta) \\]
+\\[ S_2 \propto p(e | u, s; L_1) \cdot p(u)\\]
 
 ~~~~
 ///fold:
