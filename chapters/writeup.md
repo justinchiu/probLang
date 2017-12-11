@@ -3,6 +3,7 @@ layout: chapter
 title: Modeling Referring Expression Use in Accessibility Theory
 description: "RE and CA"
 ---
+\\[ x \propto y \\]
 
 ## The Semantic Puzzle
 
