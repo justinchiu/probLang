@@ -699,6 +699,13 @@ var score = function(x) {
   return g + h + a
 }
 
+// Sample n random entities from the fully enumerated state
+// without replacement
+var statePrior = function(n, state) {
+  var shuffled = knuthShuffle(state)
+  return sort(shuffled.slice(0, n), lt, score)
+}
+
 ///
 
 // A fully enumerated state.
@@ -715,13 +722,6 @@ var fullState = [].concat.apply([], map(function(gender){
 }, genders))
 // Sort using score function.
 var fullState = sort(fullState, lt, score)
-
-// Sample n random entities from the fully enumerated state
-// without replacement
-var statePrior = function(n, state) {
-  var shuffled = knuthShuffle(state)
-  return sort(shuffled.slice(0, n), lt, score)
-}
 
 var state = fullState
 
