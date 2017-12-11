@@ -353,7 +353,7 @@ var speaker = function(state, referent, theta_dem, theta_pro){
 };
 
 // L1
-// p(ref=ent | utterance=utt, state, thetas; s1)
+// p(ref=ent | utterance=utt, state; s1)
 //     = p(utterance=utt | ref=ent, state, thetas; s1) * p(ref=ent) * p(thetas)
 var pragmaticListener = function(utterance,state){
   Infer({model: function(){
@@ -491,7 +491,7 @@ var thetaPrior = function(){
 };
 
 // L0
-// p(ref=ent | utterance=utt, state) = [utt](ent) * p(ref=ent)
+// p(ref=ent | utterance=utt, state, thetas) = [utt](ent, thetas) * p(ref=ent)
 var literalListener = function(utterance,state, theta_dem, theta_pro){
   return Infer({model: function(){
     var ref = uniformDraw(state);
@@ -505,8 +505,8 @@ var literalListener = function(utterance,state, theta_dem, theta_pro){
 var alpha = 1
 
 // S1
-// p(utterance=utt | ref=ent, state; l0) 
-//     = p(ref=ent | utterance=utt, state; l0) * p(utterance=utt)
+// p(utterance=utt | ref=ent, state, thetas; l0) 
+//     = p(ref=ent | utterance=utt, state, thetas; l0) * p(utterance=utt)
 var speaker = function(state, referent, theta_dem, theta_pro){
   Infer({model: function(){
     var utterance = utterancePrior()
@@ -517,7 +517,7 @@ var speaker = function(state, referent, theta_dem, theta_pro){
 
 // L1
 // p(ref=ent | utterance=utt, state; s1)
-//     = p(utterance=utt | ref=ent, state; s1) * p(ref=ent)
+//     = p(utterance=utt | ref=ent, state, thetas; s1) * p(ref=ent) * p(thetas)
 var pragmaticListener = function(utterance,state){
   Infer({model: function(){
     var referent = uniformDraw(state);
@@ -709,7 +709,7 @@ var thetaPrior = function(){
 };
 
 // L0
-// p(ref=ent | utterance=utt, state) = [utt](ent) * p(ref=ent)
+// p(ref=ent | utterance=utt, state, thetas) = [utt](ent, thetas) * p(ref=ent)
 var literalListener = function(utterance,state, theta_dem, theta_pro){
   return Infer({model: function(){
     var ref = uniformDraw(state);
@@ -723,8 +723,8 @@ var literalListener = function(utterance,state, theta_dem, theta_pro){
 var alpha = 1
 
 // S1
-// p(utterance=utt | ref=ent, state; l0) 
-//     = p(ref=ent | utterance=utt, state; l0) * p(utterance=utt)
+// p(utterance=utt | ref=ent, state, thetas; l0) 
+//     = p(ref=ent | utterance=utt, state, thetas; l0) * p(utterance=utt)
 var speaker = function(state, referent, theta_dem, theta_pro){
   Infer({model: function(){
     var utterance = utterancePrior()
@@ -735,7 +735,7 @@ var speaker = function(state, referent, theta_dem, theta_pro){
 
 // L1
 // p(ref=ent | utterance=utt, state; s1)
-//     = p(utterance=utt | ref=ent, state; s1) * p(ref=ent)
+//     = p(utterance=utt | ref=ent, state, thetas; s1) * p(ref=ent) * p(thetas)
 var pragmaticListener = function(utterance,state){
   Infer({model: function(){
     var referent = uniformDraw(state);
@@ -913,7 +913,7 @@ var speaker = function(state, referent, theta_dem, theta_pro){
 
 // L1
 // p(ref=ent | utterance=utt, state; s1)
-//     = p(utterance=utt | ref=ent, state; s1) * p(ref=ent)
+//     = p(utterance=utt | ref=ent, state, thetas; s1) * p(ref=ent) * p(thetas)
 var pragmaticListener = function(utterance,state){
   Infer({model: function(){
     var referent = uniformDraw(state);
