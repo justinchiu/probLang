@@ -32,6 +32,7 @@ Only together do these properties, and some language-specific structural propert
 | Pronoun  | 93.2%  | 82.1%  | 47.8%  | 26.7%  |
 | Demonstrative  | 3.4%  | 12.8%  | 10.8%  | 14.4%  |
 | Definite description | 3.4%  | 5.1%  | 41.4%  | 58.9% |
+
 *Table 1: Effect of antecedent distance on referring expression choice*
 
 This shows the pattern that pronouns are markers of high-accessibility antecedents, demonstratives of mid-accessibility, and definite descriptions of low-accessibility. Ariel takes these to be not accidental properties of these expressions, nor derived behavior from their semantics, but rather to more directly be what they mean: a pronoun's semantic denotation is that it mark a high-accessibility antecedent bearing the relevant phi-features. This allows for a very straightforward and implementable meaning in a computational model.
