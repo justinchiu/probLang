@@ -263,10 +263,20 @@ One interesting aspect is that every stage of the model sees the “state”.
 This is different from other models we have seen, but is really only a result of variable naming.
 Since the referent is only seen the speakers, we are not violating any RSA contracts.</p>
 
-<p>\[ L_0 \propto [[u]]^\theta(s) \cdot p(e) \]
-\[ S_1 = p(u | e, s, \theta; L_0) \propto p(e | u, s, \theta; L_0) \cdot p(u)\]
-\[ L_1 \propto p(u | e, s, \theta; S_1) \cdot p(e) \cdot p(\theta) \]
-\[ S_2 \propto p(e | u, s; L_1) \cdot p(u)\]</p>
+<p>The literal listener uses the meaning function parameterized by \(\theta\) to filter out
+untruthful utterance-state pairs and weight the truthful states by the referent entity prior.
+\[ L_0 \propto [[u]]^\theta(s) \cdot p(e) \]
+The first speaker weights truthful utterances by the utterance prior.
+\[ S_1 = p(u | e, s, \theta; L_0) \propto p(e | u, s, \theta; L_0) \cdot p(u) \]
+The pragmatic listener marginalizes over all combinations of \(\theta\).
+\[ L_1 = p(e | u, s; S_1) \propto p(u | e, s, \theta; S_1) \cdot p(e) \cdot p(\theta) \]
+The final speaker uses the pragmatic listener and utterance prior.
+\[ S_2 = p(u | e, s; L_1) \propto p(e | u, s; L_1) \cdot p(u) \]</p>
+
+<p>In the typical coverage of RSA, we see \(S_i = p(u | s; L_i) \propto \exp(\alpha U_S(u,s;L_i))\).
+In that case, \( U_s \) is typically a function of the log probability given by the \(L_i\) posterior.
+Since we use \(\alpha=1\) in our model and the utility function is simply the log probability itself,
+this simplifies to \( \exp(\alpha U_s) = \exp(1 \cdot \log(L_i(s | u))) = L_i(s | u)\).</p>
 
 <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>///fold:
 // Utility Functions
