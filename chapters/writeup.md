@@ -222,29 +222,6 @@ var printList = function(xs) {map(function(x){
   print(x)
 }, xs)}
 
-var swapElems = function(i, j, xs) {
-  var val = xs[i]
-  xs.splice(i, 1, xs[j])
-  xs.splice(j, 1, val)
-  return xs
-}
-
-var randomInt = function(lower, upper) {
-  var int = randomInteger(upper-lower+1)
-  return int+lower
-}
-
-var knuthShuffle = function(xs) {
-  var len = xs.length
-  var rands = mapN(function(n){return [n, randomInteger(n+1)]}, len)
-  var ok = reduce(function(x, acc){
-    var i = x[0]
-    var j = x[1]
-    return swapElems(i, j, acc)
-  }, xs, rands)
-  return ok
-}
-
 // Possible properties.
 var genders = ["male", "female"]
 var heights = ["short", "tall"]
@@ -273,39 +250,6 @@ var fullState = [].concat.apply([], map(function(gender){
 // Sort using score function.
 var fullState = sort(fullState, lt, score)
 
-// A partial state.
-var state = [
-  {
-    gender: "male",
-    height: "short",
-    access: 1
-  },
-  {
-    gender: "male",
-    height: "tall",
-    access: 1
-  },
-  {
-    gender: "female",
-    height: "short",
-    access: 1
-  },
-
-  {
-    gender: "female",
-    height: "tall",
-    access: 3
-  },
-]
-
-// Sample n random entities from the fully enumerated state
-// without replacement
-var statePrior = function(n, state) {
-  var shuffled = knuthShuffle(state)
-  return sort(shuffled.slice(0, n), lt, score)
-}
-
-// Shadow partial state with fullState.
 var state = fullState
 
 // Possible utterances
@@ -412,29 +356,6 @@ var printList = function(xs) {map(function(x){
   print(x)
 }, xs)}
 
-var swapElems = function(i, j, xs) {
-  var val = xs[i]
-  xs.splice(i, 1, xs[j])
-  xs.splice(j, 1, val)
-  return xs
-}
-
-var randomInt = function(lower, upper) {
-  var int = randomInteger(upper-lower+1)
-  return int+lower
-}
-
-var knuthShuffle = function(xs) {
-  var len = xs.length
-  var rands = mapN(function(n){return [n, randomInteger(n+1)]}, len)
-  var ok = reduce(function(x, acc){
-    var i = x[0]
-    var j = x[1]
-    return swapElems(i, j, acc)
-  }, xs, rands)
-  return ok
-}
-
 // Possible properties.
 var genders = ["male", "female"]
 var heights = ["short", "tall"]
@@ -463,14 +384,6 @@ var fullState = [].concat.apply([], map(function(gender){
 // Sort using score function.
 var fullState = sort(fullState, lt, score)
 
-// Sample n random entities from the fully enumerated state
-// without replacement
-var statePrior = function(n, state) {
-  var shuffled = knuthShuffle(state)
-  return sort(shuffled.slice(0, n), lt, score)
-}
-
-// Shadow partial state with fullState.
 var state = fullState
 
 // Possible utterances
@@ -627,29 +540,6 @@ var printList = function(xs) {map(function(x){
   print(x)
 }, xs)}
 
-var swapElems = function(i, j, xs) {
-  var val = xs[i]
-  xs.splice(i, 1, xs[j])
-  xs.splice(j, 1, val)
-  return xs
-}
-
-var randomInt = function(lower, upper) {
-  var int = randomInteger(upper-lower+1)
-  return int+lower
-}
-
-var knuthShuffle = function(xs) {
-  var len = xs.length
-  var rands = mapN(function(n){return [n, randomInteger(n+1)]}, len)
-  var ok = reduce(function(x, acc){
-    var i = x[0]
-    var j = x[1]
-    return swapElems(i, j, acc)
-  }, xs, rands)
-  return ok
-}
-
 // Possible properties.
 var genders = ["male", "female"]
 var heights = ["short", "tall"]
@@ -661,13 +551,6 @@ var score = function(x) {
   var h = x.height === "short" ? 10 : 20
   var a = x.access
   return g + h + a
-}
-
-// Sample n random entities from the fully enumerated state
-// without replacement
-var statePrior = function(n, state) {
-  var shuffled = knuthShuffle(state)
-  return sort(shuffled.slice(0, n), lt, score)
 }
 
 ///
@@ -817,29 +700,6 @@ var printList = function(xs) {map(function(x){
   print(x)
 }, xs)}
  
-var swapElems = function(i, j, xs) {
-  var val = xs[i]
-  xs.splice(i, 1, xs[j])
-  xs.splice(j, 1, val)
-  return xs
-}
-
-var randomInt = function(lower, upper) {
-  var int = randomInteger(upper-lower+1)
-  return int+lower
-}
-
-var knuthShuffle = function(xs) {
-  var len = xs.length
-  var rands = mapN(function(n){return [n, randomInteger(n+1)]}, len)
-  var ok = reduce(function(x, acc){
-    var i = x[0]
-    var j = x[1]
-    return swapElems(i, j, acc)
-  }, xs, rands)
-  return ok
-}
-
 // Possible properties.
 var genders = ["male", "female"]
 var heights = ["short", "tall"]
@@ -868,14 +728,6 @@ var fullState = [].concat.apply([], map(function(gender){
 // Sort using score function.
 var fullState = sort(fullState, lt, score)
 
-// Sample n random entities from the fully enumerated state
-// without replacement
-var statePrior = function(n, state) {
-  var shuffled = knuthShuffle(state)
-  return sort(shuffled.slice(0, n), lt, score)
-}
-
-// Shadow partial state with fullState.
 var state = fullState
 
 // Possible utterances
