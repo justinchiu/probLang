@@ -134,27 +134,31 @@ var statePrior = function(state) {
 }
 ~~~~
 
-At this point, our setup looks a bit like Frank and Goodman's original RSA model for the blue circle
-reference game. We have a state where entities share properties, and thus some referring expressions may
-be ambiguous. For example, similar to how we would disambiguate "blue" to refer to the blue circle or square,
-how can we resolve the pronoun "he" if the state contains two males of different heights?
+The state we wish to examine in our model is very similar to the reference game in Frank and Goodman's 2012 RSA paper.
+In their setup, they had a state with three objects, which had two distinct shapes and two distinct color properties.
+Since any given utterance which uses either only the shape or color in an attempt to disambiguate a referent may
+be ambiguous, Frank and Goodman use the RSA framework to model the pragmatics of disambiguation.
+For example, given a state which has a blue circle, a green circle, and a blue square,
+the utterance "blue" could refer to either the blue circle or the blue square.
+Frank and Goodman's model is able to reason that "blue" is more likely to refer to the
+blue circle, since "square" would have been a more informative utterance for the blue square.
+In our state, an ambiguous utterance could be "he" in a state with multiple male entities.
 
-To do so we introduce two accessibility thresholds, one each for the demonstrative and pronoun referring expressions.
+In order to disambiguate such an utterance we introduce two accessibility thresholds, 
+one each for the demonstrative and pronoun referring expressions.
 Intuitively, we assume that either referring expression
 is used if an entity's accessibility is greater than or equal to the 
 corresponding threshold, with the pronoun taking precedence over the demonstrative.
 If the entity's access is lower than both thresholds, we default to the definite description.
 
-This is similar to the Lassiter and Goodman model for gradable adjectives.
-Analogous to how a threshold on cost was communicated by the statement "expensive",
-a referring expression marks whether an entity’s accessibility exceeds a threshold.
-Since we have multiple thresholds, the analogous setup for kettles would be to have one threshold for
-"expensive" and one for "very expensive".
+This is similar to the Lassiter and Goodman model for gradable adjectives (Lassiter and Goodman 2013).
+One scenario they considered was the utterance "expensive" when used to describe the prices of houses.
+They posited that the use of "expensive" communicated a threshold on cost, above which a house was considered "expensive".
+In our model, we use pronouns or demonstratives to communicate a threshold on accessibility.
+Since we have multiple thresholds, the analogous setup for houses would be to have one threshold for "expensive" and one for "very expensive".
 The main difference between our model and the Lassiter and Goodman model
-is that the comparison class for an object (in the case of 
-the gradable adjectives model, this would be the cost of a kettle) would be all possible objects (costs of kettles)
-in the adjectives model. 
-In our setting the accessibility of an entity must only compete with other existing entities in the state. 
+is that the comparison class for an object would be all possible objects in the adjectives model. 
+In our setting, the accessibility of an entity must only compete with other existing entities in the state. 
 
 Below is our meaning function, the joint distribution over states and utterances:
 ~~~~
@@ -986,7 +990,6 @@ higher temperature in the Gibbs distributions.
 
 ## Limitations & Future Work
 
-
 While in its current state, the model captures the qualitative behavior of the set of corpus data motivating Accessibility Theory, and many of our intuitions about referring expressions, there are three shortcomings of this approach. The first issue to consider is whether this kind of corpus data is what we want to be modeling in the first place. While Ariel's (1988) data is compiled from a mix of fiction and non-fiction sources, the overall size is relatively small, with four texts contributing.  While our model's results are certainly not at odds with more robust experimental work (e.g. Tily & Piantadosi 2000), it should also be tested against much larger and more varied corpora. There is a secondary concern here as to whether corpus data is the gold standard against which a model should be measured in the first place, and so ideally a model would account for the behavior of referring expressions in both experimental and large-scale corpus contexts.
 
 Second, our model only captures the *qualitative* patterns in the existing corpus data. While we do get the correct relative rankings of preference between different types of referring expressions, the precise probabilities are not well captured. In particular, the preferences for pronouns in high-accessibility conditions and definite descriptions in low-accessibility conditions are much more drastic than our model predicts; while our model does assign a clear preference, the difference between the first and second choice expression is usually in the realm of 10-20% probability, while in the corpus data, it is often closer to 60-70%. Given that this preference is powerful in both directions, it cannot be easily resolved in our model just by assigning a higher prior probability (that is, a lower structural cost) to either pronouns or definite descriptions.
@@ -1019,6 +1022,8 @@ Fukumura, Kumiko, and Roger P.G. van Gompel. 2012. *Producing Pronouns and Defin
 Heim, Irene. 1982. *The Semantics of Definite and Indefinite Noun Phrases*. Ph.D. thesis, University of Massachusetts, Amherst, PhD.
 
 Kaplan, David. 1989. “Demonstratives,” in Almog, Perry, and Wettstein 1989, pp. 481–563.
+
+Lassiter, Daniel, and Goodman, Noah D. *Context, scale structure, and statistics in the interpretation of positive-form adjectives". Semantics and Linguistic Theory, p. 587-610, Aug. 2013.
 
 Patel-Grosz, Pritty and Patrick G. Grosz. 2017. *Revisiting pronominal typology*. Linguistic Inquiry 48:2.
 

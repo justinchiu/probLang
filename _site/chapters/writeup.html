@@ -199,27 +199,31 @@ var statePrior = function(state) {
 }
 </code></pre></div></div>
 
-<p>At this point, our setup looks a bit like Frank and Goodman’s original RSA model for the blue circle
-reference game. We have a state where entities share properties, and thus some referring expressions may
-be ambiguous. For example, similar to how we would disambiguate “blue” to refer to the blue circle or square,
-how can we resolve the pronoun “he” if the state contains two males of different heights?</p>
+<p>The state we wish to examine in our model is very similar to the reference game in Frank and Goodman’s 2012 RSA paper.
+In their setup, they had a state with three objects, which had two distinct shapes and two distinct color properties.
+Since any given utterance which uses either only the shape or color in an attempt to disambiguate a referent may
+be ambiguous, Frank and Goodman use the RSA framework to model the pragmatics of disambiguation.
+For example, given a state which has a blue circle, a green circle, and a blue square,
+the utterance “blue” could refer to either the blue circle or the blue square.
+Frank and Goodman’s model is able to reason that “blue” is more likely to refer to the
+blue circle, since “square” would have been a more informative utterance for the blue square.
+In our state, an ambiguous utterance could be “he” in a state with multiple male entities.</p>
 
-<p>To do so we introduce two accessibility thresholds, one each for the demonstrative and pronoun referring expressions.
+<p>In order to disambiguate such an utterance we introduce two accessibility thresholds, 
+one each for the demonstrative and pronoun referring expressions.
 Intuitively, we assume that either referring expression
 is used if an entity’s accessibility is greater than or equal to the 
 corresponding threshold, with the pronoun taking precedence over the demonstrative.
 If the entity’s access is lower than both thresholds, we default to the definite description.</p>
 
-<p>This is similar to the Lassiter and Goodman model for gradable adjectives.
-Analogous to how a threshold on cost was communicated by the statement “expensive”,
-a referring expression marks whether an entity’s accessibility exceeds a threshold.
-Since we have multiple thresholds, the analogous setup for kettles would be to have one threshold for
-“expensive” and one for “very expensive”.
+<p>This is similar to the Lassiter and Goodman model for gradable adjectives (Lassiter and Goodman 2013).
+One scenario they considered was the utterance “expensive” when used to describe the prices of houses.
+They posited that the use of “expensive” communicated a threshold on cost, above which a house was considered “expensive”.
+In our model, we use pronouns or demonstratives to communicate a threshold on accessibility.
+Since we have multiple thresholds, the analogous setup for houses would be to have one threshold for “expensive” and one for “very expensive”.
 The main difference between our model and the Lassiter and Goodman model
-is that the comparison class for an object (in the case of 
-the gradable adjectives model, this would be the cost of a kettle) would be all possible objects (costs of kettles)
-in the adjectives model. 
-In our setting the accessibility of an entity must only compete with other existing entities in the state.</p>
+is that the comparison class for an object would be all possible objects in the adjectives model. 
+In our setting, the accessibility of an entity must only compete with other existing entities in the state.</p>
 
 <p>Below is our meaning function, the joint distribution over states and utterances:</p>
 <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>var softMeanings = function(utterance, referent, theta_dem, theta_pro){
@@ -1105,6 +1109,8 @@ higher temperature in the Gibbs distributions.</p>
 <p>Heim, Irene. 1982. <em>The Semantics of Definite and Indefinite Noun Phrases</em>. Ph.D. thesis, University of Massachusetts, Amherst, PhD.</p>
 
 <p>Kaplan, David. 1989. “Demonstratives,” in Almog, Perry, and Wettstein 1989, pp. 481–563.</p>
+
+<p>Lassiter, Daniel, and Goodman, Noah D. *Context, scale structure, and statistics in the interpretation of positive-form adjectives”. Semantics and Linguistic Theory, p. 587-610, Aug. 2013.</p>
 
 <p>Patel-Grosz, Pritty and Patrick G. Grosz. 2017. <em>Revisiting pronominal typology</em>. Linguistic Inquiry 48:2.</p>
 
