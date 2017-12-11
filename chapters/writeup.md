@@ -639,6 +639,8 @@ var score = function(x) {
   return g + h + a
 }
 
+///
+
 // A fully enumerated state.
 var fullState = [].concat.apply([], map(function(gender){
   [].concat.apply([], map(function(height){
@@ -661,8 +663,9 @@ var statePrior = function(n, state) {
   return sort(shuffled.slice(0, n), lt, score)
 }
 
-// Shadow partial state with fullState.
 var state = fullState
+
+///fold:
 
 // Possible utterances
 var utterances = ['null','he', 'she', 'that boy', 'that girl', 'the tall boy',

@@ -39,8 +39,6 @@
       <div class="page-content">
         <h1 class="chapter-title">Modeling Referring Expression Use in Accessibility Theory</h1>
 
-<p>\[ x \propto y \]</p>
-
 <h2 id="the-semantic-puzzle">The Semantic Puzzle</h2>
 
 <p>In any given discourse context, the set of entities to which it is possible for a speaker to refer is quite large, including at least all physically present individuals, all those in the epistemic common ground of the interlocutors, and potentially any new referent that a speaker chooses to introduce into that common ground. Compounding this situation, most referring expressions in our lexicon are underspecified in their reference, such that they will often be ambiguous between two or more possible referents in the context, as many of them will share the minimal features for which referring expressions are specified (i.e. their grammatical phi-features, in the case of pronouns). Given these two facts, how does a speaker select which expression to use to signal an intended referent to a listener? Following this, how does a listener, upon hearing an utterance, disambiguate between all the possible referents for which that utterance is literally true, and identify the intended referent of the speaker?</p>
@@ -68,7 +66,42 @@
 
 <p>Only together do these properties, and some language-specific structural properties, accurately predict a speaker’s choice in referring expression (Ariel 2001). It is argued to be a distinctly non-binary variable, contrasting with prior work (see Givon 1983), but rather operate over a gradient. For the purposes of easy visualization, take one highly relevant factor, the distance between the referring expression and the last utterance of its antecedent. The table below (reproduced from Ariel 1988) shows preferences for pronouns, demonstratives, and definite descriptions in different contexts:</p>
 
-<p><img src="https://github.com/justinchiu/probLang/raw/master/images/ling_table.png" alt="Alt text" /></p>
+<table>
+  <thead>
+    <tr>
+      <th> </th>
+      <th>Same sentence</th>
+      <th>Previous sentence</th>
+      <th>Same paragraph</th>
+      <th>Across Paragraph</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Pronoun</td>
+      <td>93.2%</td>
+      <td>82.1%</td>
+      <td>47.8%</td>
+      <td>26.7%</td>
+    </tr>
+    <tr>
+      <td>Demonstrative</td>
+      <td>3.4%</td>
+      <td>12.8%</td>
+      <td>10.8%</td>
+      <td>14.4%</td>
+    </tr>
+    <tr>
+      <td>Definite description</td>
+      <td>3.4%</td>
+      <td>5.1%</td>
+      <td>41.4%</td>
+      <td>58.9%</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><em>Table 1: Effect of antecedent distance on referring expression choice</em></p>
 
 <p>This shows the pattern that pronouns are markers of high-accessibility antecedents, demonstratives of mid-accessibility, and definite descriptions of low-accessibility. Ariel takes these to be not accidental properties of these expressions, nor derived behavior from their semantics, but rather to more directly be what they mean: a pronoun’s semantic denotation is that it mark a high-accessibility antecedent bearing the relevant phi-features. This allows for a very straightforward and implementable meaning in a computational model.</p>
 
@@ -76,22 +109,18 @@
 
 <h2 id="the-model">The Model</h2>
 
-<p>Before outlining the model, we review the Rational Speech Act.</p>
+<p>Before outlining the details of our model, we review the generalized Rational Speech Act model.</p>
 
-<h3 id="the-rational-speech-act">The Rational Speech Act</h3>
+<h3 id="the-rational-speech-act-model">The Rational Speech Act model</h3>
 
-<p>Introduced in Frank and Goodman (2012), the Rational Speech Act (RSA) is a framework for modeling
-simple communication scenarios probabilistically.
-Typically RSA takes the form of a stack of listeners and speakers: a listener hears
-an utterance and returns a distribution of states; a speaker observes a state and produces an utterance.
-At the bottom of the stack is a meaning function which evaluates the truthiness of an utterance
+<p>Introduced in Frank and Goodman (2012), the Rational Speech Act (RSA) model is a framework for modeling
+simple communication scenarios probabilistically. It posits recursive pragmatic reasoning between a listener and a speaker attempting to be optimally informative for the lowest-cost utterances, i.e. speaking most efficiently. With the intent to communicate some property of the world state, a pragmatic speaker reasons about what conclusions a listener who is only concerned with literal meaning of utterances would draw from any given utterance, and selects the utterance most likely to direct the listener to the correct world state. The literal listener here is a modeling tool, not a representation of any real individual in a discourse; real listeners are modeled in a higher recursive layer, the pragmatic listener, which reasons about which utterance a pragmatic speaker (with access to the literal meanings of the literal listener) would select to communicate any given world state, and returns another distribution over states given the utterance it hears from the pragmatic speaker. Our model requires another recursive speaker layer on top of this to resolve an additional variable; this will be discussed below. Computationally, this takes the form of a stack of listeners and speakers: a listener hears an utterance and returns a distribution of states; a speaker observes a state and returns a distribution over utterances. At the bottom of the stack is a meaning function which evaluates the truthiness of an utterance
 given a state, which can be viewed as a joint distribution over utterances and states.</p>
 
 <h3 id="setup">Setup</h3>
 
-<p>We model the state as a list of entities that are of either male or female gender, and only have one other
-identifying property: their height. For our model we assume that
-every possible combination of gender and height is enumerated in the state.</p>
+<p>We model the state as a list of entities that are of either male or female gender (given that all of these utterances are third person singular, this is the only relevant phi feature that could assist in utterance choice), and for simplicity have only one other
+identifying property: their height. For our model we assume that every possible combination of gender and height is enumerated in the state. The default state, then, consists of four entities, for each of these combinations, though as we will see nothing about the rest of the model enforces a maximum of four.</p>
 
 <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// Possible properties.
 var genders = ["male", "female"]
@@ -144,7 +173,7 @@ the utterance prior’s distribution is an inverted word count model.
 Shorter utterances, such as the pronouns, receive higher mass than longer utterances.
 This is highly analgous to coding or compression schemes which seek to minimize total message length.</p>
 
-<p>For our state prior, since we would like to have a fully enumerated state, we can sample
+<p>For our state prior, since we would like to observe the speaker’s behavior a fully enumerated state, we can sample
 accessibility levels for each of the possible entities.</p>
 
 <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// Possible utterances
@@ -614,25 +643,18 @@ var printer = map(function(ref) {
 }, state)
 </code></pre></div></div>
 
-<p>Note that the utterance distributions of the low access male and low access female have the same ordering over REs,
-even though they have different accessibilities. This is due to the
-model partitioning the mass of utterances over semantically compatible entities.</p>
+<p>We see that the pronoun is preferred for the higher-access cases, and the definite description, which is both higher cost and informativity, is preferred in the lower-access cases. Note that the utterance distributions of the low access male and low access female have the same ordering over REs, even though they have different accessibilities. This is due to the model partitioning the mass of utterances over semantically compatible entities. Thus, even though the tall male entity here is technically ‘mid’ accessibility, at 2, it behaves as a high accessibility entity because it is high relative to its competitor.</p>
 
 <p>Given that the model performs inference over relative accessibilities with respect to
 entities that share properties, you might expect that the highest access
-entities in each class might have a similar utterance distribution.
-However, this is not the case, as the “null” utterance treats the entire state
-as its comparison class.</p>
+entities in each class to have identical utterance distributions.
+However, this is not the case, as we see “null” given greater probability mass for the higher-access female than for the higher-access male. This is because the “null” utterance treats the entire state as its comparison class, since it abstracts over gender and height features, and so the tall male, which is treated as high-accessibility for the purposes of gender-marked expressions, is treated instead as mid-accessibility for expressions that could select the overall higher-accessibility female entity.</p>
 
 <h3 id="fully-enumerated-state">Fully Enumerated State</h3>
 
 <p>We now examine the model’s output on a fully enumerated state
-with the cartesian product of all genders, heights, and accessibilities.
-We expect to see results similar to the following table:
-<img src="https://github.com/justinchiu/probLang/raw/master/images/ling_table2.png" alt="Alt text" /></p>
-
-<p>Let accessibility=1 be the same sentence, accessibility=2 denote the previous sentence,
-and accessibility=3 correspond to the same paragraph.</p>
+with the cartesian product of all genders, heights, and accessibilities. Given the expansive number of possible referents in most real discourse situations, taking into account that possible referents include not only those physically present but also those in some degree of shared epistemic background between the listener and speaker, this is likely an even better model of real behavior.
+We expect to see results similar to Table 1 in Section 1.</p>
 
 <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>///fold:
 // Utility Functions
@@ -677,6 +699,8 @@ var score = function(x) {
   return g + h + a
 }
 
+///
+
 // A fully enumerated state.
 var fullState = [].concat.apply([], map(function(gender){
   [].concat.apply([], map(function(height){
@@ -699,8 +723,9 @@ var statePrior = function(n, state) {
   return sort(shuffled.slice(0, n), lt, score)
 }
 
-// Shadow partial state with fullState.
 var state = fullState
+
+///fold:
 
 // Possible utterances
 var utterances = ['null','he', 'she', 'that boy', 'that girl', 'the tall boy',
@@ -802,10 +827,44 @@ var printer = map(function(ref) {
 }, state)
 </code></pre></div></div>
 
-<p>Since we have neither an accurate cost function for utterances nor a good model
-for accessibility, the actual discrepancy between the model distribution and the data 
-distribution is high. However, the relative ordering of utterances for
-each entity is quite similar.</p>
+<p>The simplified nature of our state model and the relatively close steps in our accessibility variable lead to a high actual discrepancy between the model distribution and the data distribution, in terms of quantitative patterns. Namely, the corpus data shows much sharper preferences for the most preferred expression, while our model returns overall much smoother and more gradient preferences between expressions with smaller differences. However, the relative ordering of utterances for each entity is exactly as predicted by the corpus data. Table 1 is reproduced below for ease of comparison:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th> </th>
+      <th>Same sentence</th>
+      <th>Previous sentence</th>
+      <th>Same paragraph</th>
+      <th>Across Paragraph</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Pronoun</td>
+      <td>93.2%</td>
+      <td>82.1%</td>
+      <td>47.8%</td>
+      <td>26.7%</td>
+    </tr>
+    <tr>
+      <td>Demonstrative</td>
+      <td>3.4%</td>
+      <td>12.8%</td>
+      <td>10.8%</td>
+      <td>14.4%</td>
+    </tr>
+    <tr>
+      <td>Definite description</td>
+      <td>3.4%</td>
+      <td>5.1%</td>
+      <td>41.4%</td>
+      <td>58.9%</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Without reference to the empirical data, it might be seen as a fault of our model that the demonstrative is never the most preferred expression, even in its supposedly preferred mid-accessbility contexts. However, this is exactly the pattern borne out in the data. This is likely a reflection of the demonstrative failing to win out in either informativeness or cost, as with the existing model, it encodes no additional information beyond what the strictly lower-cost pronoun does. This is discussed more below.</p>
 
 <h3 id="alternative-implementation">Alternative Implementation</h3>
 
