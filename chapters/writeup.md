@@ -3,7 +3,6 @@ layout: chapter
 title: Modeling Referring Expression Use in Accessibility Theory
 description: "RE and CA"
 ---
-\\[ x \propto y \\]
 
 ## The Semantic Puzzle
 
@@ -28,8 +27,12 @@ Accessibility Theory (Ariel 1985, 1991) provides a more cognitively-focused and 
     
 Only together do these properties, and some language-specific structural properties, accurately predict a speaker’s choice in referring expression (Ariel 2001). It is argued to be a distinctly non-binary variable, contrasting with prior work (see Givon 1983), but rather operate over a gradient. For the purposes of easy visualization, take one highly relevant factor, the distance between the referring expression and the last utterance of its antecedent. The table below (reproduced from Ariel 1988) shows preferences for pronouns, demonstratives, and definite descriptions in different contexts:
 
-![Alt text](https://github.com/justinchiu/probLang/raw/master/images/ling_table.png)
-
+|   | Same sentence  | Previous sentence  |  Same paragraph | Across Paragraph | 
+|---|---|---|---|---|
+| Pronoun  | 93.2%  | 82.1%  | 47.8%  | 26.7%  |
+| Demonstrative  | 3.4%  | 12.8%  | 10.8%  | 14.4%  |
+| Definite description | 3.4%  | 5.1%  | 41.4%  | 58.9% |
+*Table 1: Effect of antecedent distance on referring expression choice*
 
 This shows the pattern that pronouns are markers of high-accessibility antecedents, demonstratives of mid-accessibility, and definite descriptions of low-accessibility. Ariel takes these to be not accidental properties of these expressions, nor derived behavior from their semantics, but rather to more directly be what they mean: a pronoun's semantic denotation is that it mark a high-accessibility antecedent bearing the relevant phi-features. This allows for a very straightforward and implementable meaning in a computational model.
 
@@ -37,22 +40,18 @@ The notion of accessibility as a kind of choice function, which maps a set of po
 
 ## The Model
 
-Before outlining the model, we review the Rational Speech Act.
+Before outlining the details of our model, we review the generalized Rational Speech Act model.
 
-### The Rational Speech Act
+### The Rational Speech Act model
 
-Introduced in Frank and Goodman (2012), the Rational Speech Act (RSA) is a framework for modeling
-simple communication scenarios probabilistically.
-Typically RSA takes the form of a stack of listeners and speakers: a listener hears
-an utterance and returns a distribution of states; a speaker observes a state and produces an utterance.
-At the bottom of the stack is a meaning function which evaluates the truthiness of an utterance
+Introduced in Frank and Goodman (2012), the Rational Speech Act (RSA) model is a framework for modeling
+simple communication scenarios probabilistically. It posits recursive pragmatic reasoning between a listener and a speaker attempting to be optimally informative for the lowest-cost utterances, i.e. speaking most efficiently. With the intent to communicate some property of the world state, a pragmatic speaker reasons about what conclusions a listener who is only concerned with literal meaning of utterances would draw from any given utterance, and selects the utterance most likely to direct the listener to the correct world state. The literal listener here is a modeling tool, not a representation of any real individual in a discourse; real listeners are modeled in a higher recursive layer, the pragmatic listener, which reasons about which utterance a pragmatic speaker (with access to the literal meanings of the literal listener) would select to communicate any given world state, and returns another distribution over states given the utterance it hears from the pragmatic speaker. Our model requires another recursive speaker layer on top of this to resolve an additional variable; this will be discussed below. Computationally, this takes the form of a stack of listeners and speakers: a listener hears an utterance and returns a distribution of states; a speaker observes a state and returns a distribution over utterances. At the bottom of the stack is a meaning function which evaluates the truthiness of an utterance
 given a state, which can be viewed as a joint distribution over utterances and states.
 
 ### Setup
 
-We model the state as a list of entities that are of either male or female gender, and only have one other
-identifying property: their height. For our model we assume that
-every possible combination of gender and height is enumerated in the state.
+We model the state as a list of entities that are of either male or female gender (given that all of these utterances are third person singular, this is the only relevant phi feature that could assist in utterance choice), and for simplicity have only one other
+identifying property: their height. For our model we assume that every possible combination of gender and height is enumerated in the state. The default state, then, consists of four entities, for each of these combinations, though as we will see nothing about the rest of the model enforces a maximum of four.
 
 ~~~~
 // Possible properties.
@@ -107,7 +106,7 @@ the utterance prior's distribution is an inverted word count model.
 Shorter utterances, such as the pronouns, receive higher mass than longer utterances.
 This is highly analgous to coding or compression schemes which seek to minimize total message length.
 
-For our state prior, since we would like to have a fully enumerated state, we can sample
+For our state prior, since we would like to observe the speaker's behavior a fully enumerated state, we can sample
 accessibility levels for each of the possible entities.
 
 ~~~~
@@ -581,26 +580,19 @@ var printer = map(function(ref) {
 }, state)
 ~~~~
 
-Note that the utterance distributions of the low access male and low access female have the same ordering over REs,
-even though they have different accessibilities. This is due to the
-model partitioning the mass of utterances over semantically compatible entities.
+We see that the pronoun is preferred for the higher-access cases, and the definite description, which is both higher cost and informativity, is preferred in the lower-access cases. Note that the utterance distributions of the low access male and low access female have the same ordering over REs, even though they have different accessibilities. This is due to the model partitioning the mass of utterances over semantically compatible entities. Thus, even though the tall male entity here is technically 'mid' accessibility, at 2, it behaves as a high accessibility entity because it is high relative to its competitor.
 
 Given that the model performs inference over relative accessibilities with respect to
 entities that share properties, you might expect that the highest access
-entities in each class might have a similar utterance distribution.
-However, this is not the case, as the "null" utterance treats the entire state
-as its comparison class.
+entities in each class to have identical utterance distributions.
+However, this is not the case, as we see "null" given greater probability mass for the higher-access female than for the higher-access male. This is because the "null" utterance treats the entire state as its comparison class, since it abstracts over gender and height features, and so the tall male, which is treated as high-accessibility for the purposes of gender-marked expressions, is treated instead as mid-accessibility for expressions that could select the overall higher-accessibility female entity.
 
 
 ### Fully Enumerated State
 
 We now examine the model's output on a fully enumerated state
-with the cartesian product of all genders, heights, and accessibilities.
-We expect to see results similar to the following table:
-![Alt text](https://github.com/justinchiu/probLang/raw/master/images/ling_table2.png)
-
-Let accessibility=1 be the same sentence, accessibility=2 denote the previous sentence,
-and accessibility=3 correspond to the same paragraph.
+with the cartesian product of all genders, heights, and accessibilities. Given the expansive number of possible referents in most real discourse situations, taking into account that possible referents include not only those physically present but also those in some degree of shared epistemic background between the listener and speaker, this is likely an even better model of real behavior.
+We expect to see results similar to Table 1 in Section 1.
 
 ~~~~
 ///fold:
@@ -771,11 +763,15 @@ var printer = map(function(ref) {
 }, state)
 ~~~~
 
-Since we have neither an accurate cost function for utterances nor a good model
-for accessibility, the actual discrepancy between the model distribution and the data 
-distribution is high. However, the relative ordering of utterances for
-each entity is quite similar.
+The simplified nature of our state model and the relatively close steps in our accessibility variable lead to a high actual discrepancy between the model distribution and the data distribution, in terms of quantitative patterns. Namely, the corpus data shows much sharper preferences for the most preferred expression, while our model returns overall much smoother and more gradient preferences between expressions with smaller differences. However, the relative ordering of utterances for each entity is exactly as predicted by the corpus data. Table 1 is reproduced below for ease of comparison:
 
+|   | Same sentence  | Previous sentence  |  Same paragraph | Across Paragraph | 
+|---|---|---|---|---|
+| Pronoun  | 93.2%  | 82.1%  | 47.8%  | 26.7%  |
+| Demonstrative  | 3.4%  | 12.8%  | 10.8%  | 14.4%  |
+| Definite description | 3.4%  | 5.1%  | 41.4%  | 58.9% |
+
+Without reference to the empirical data, it might be seen as a fault of our model that the demonstrative is never the most preferred expression, even in its supposedly preferred mid-accessbility contexts. However, this is exactly the pattern borne out in the data. This is likely a reflection of the demonstrative failing to win out in either informativeness or cost, as with the existing model, it encodes no additional information beyond what the strictly lower-cost pronoun does. This is discussed more below.
 
 ### Alternative Implementation
 
